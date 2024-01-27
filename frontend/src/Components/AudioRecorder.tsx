@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { formatSeconds } from "../utils/utils";
 
-const AudioRecorder = () => {
+const AudioRecorder = ({ sendMessage, setShowAudioRecordModal }) => {
   const [isRecording, setIsRecording] = useState<{ duration: number } | false>(
     false
   );
@@ -37,29 +37,17 @@ const AudioRecorder = () => {
 
       mediaRecorderRef.current.onstop = async () => {
         const audioBlob = new Blob(chunksRef.current, { type: "audio/mp3" });
-        const audioFile = new File([audioBlob], "audio.mp3");
         console.log(audioBlob);
-        const formData = new FormData();
-        formData.append("audio_file", audioBlob, `recording-${Date.now()}.mp3`);
-
-        console.log(formData);
-        try {
-          const response = await fetch("http://127.0.0.1:8000/audio", {
-            method: "POST",
-
-            body: formData,
-          });
-
-          if (response.ok) {
-            const responseData = await response.json();
-            console.log("API response:", responseData);
-            // Handle the API response as needed
-          } else {
-            console.log("Failed to upload audio. Server returned:", response);
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const base64Audio = event.target?.result;
+          if (base64Audio) {
+            console.log(base64Audio.toString());
+            sendMessage(base64Audio.toString(), "audio");
+            setShowAudioRecordModal(false);
           }
-        } catch (error) {
-          console.log("Error uploading audio:", error);
-        }
+        };
+        reader.readAsDataURL(audioBlob);
       };
 
       mediaRecorderRef.current.start();
@@ -77,7 +65,7 @@ const AudioRecorder = () => {
   };
 
   return (
-    <div className="flex justify-center items-center w-screen h-screen">
+    <div className="flex justify-center items-center w-screen h-screen text-white">
       {isRecording ? (
         <button onClick={stopRecording}>
           <p className="font-bold text-2xl">

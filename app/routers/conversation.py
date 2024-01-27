@@ -18,30 +18,17 @@ class Login_Credentials(BaseModel):
 
 
 db = client.get_database("chat_application")
-user_collection = db["users"]
+conversation_collection = db["conversations"]
 
 
 @router.get("/conversation")
-async def get_conversation(userId: str, to: str):
-    user = user_collection.find_one({"_id": ObjectId(userId)})
-
-    if user is None:
-        raise HTTPException(status_code=404, detail="No user found")
-
-    user_dict = dict(user)
-    if "conversations" in user_dict and user_dict["conversations"] is not None:
-        conversations = list(user_dict["conversations"])
-    else:
-        conversations = list([])
-
-    conversation = next((x for x in conversations if x["userId"] == userId), None)
-    print("conversation", conversation)
+async def get_conversation(conversationId: str):
+    conversation = conversation_collection.find_one({"id": conversationId})
 
     if conversation is None:
-        conversationId = uuid.uuid4()
-        messages =  []
-    else:
-        conversationId = ""
         messages = []
+    else:
+        print(conversation["messages"])
+        messages = list(conversation["messages"])
 
-    return {"conversationId": conversationId, "messages": messages}
+    return {"messages": messages}

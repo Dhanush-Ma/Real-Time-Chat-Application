@@ -48,7 +48,6 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
         while True:
             data = await websocket.receive_text()
             message = data
-            # print(message)
             message_dict = json.loads(message)
             userId, flag, to, type, conversationId = (
                 message_dict["userId"],
@@ -57,33 +56,17 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                 message_dict["type"],
                 message_dict["conversationId"],
             )
-            print(userId)
-            # if flag == "new" and type == "message":
-            #     re = user_collection.update_one(
-            #         {"_id": ObjectId(userId)},
-            #         {"$push": {"converstions": {to: conversationId}}},
-            #     )
-            #     print(re)
-            #     user_collection.update_one(
-            #         {"_id": ObjectId(to)},
-            #         {"$push": {"converstions": {userId: conversationId}}},
-            #     )
+            # print(message_dict["message"])
+            if type == "message" or type == "image" or type == "audio":
+                conversation_collection.update_one(
+                    {"conversationId": conversationId},
+                    {
+                        "$push": {"messages": message_dict},
+                        "$set": {"id": conversationId},
+                    },
+                    upsert=True,
+                )
 
-            #     conversation_collection.insert_one(
-            #         {
-            #             conversationId: {
-            #                 "id": conversationId,
-            #                 "messages": {"$push", message},
-            #             }
-            #         }
-            #     )
-            # else:
-            #     conversation_collection.update_one(
-            #         {"conversationId": conversationId},
-            #         {
-            #             "messages": {"$push", message},
-            #         },
-            #     )
             await manager.broadcast(message)
 
     except WebSocketDisconnect:

@@ -32,7 +32,9 @@ const Users = ({ setFocuedChatWindowUserId, focuedChatWindowUserId }) => {
                 }}
                 style={{
                   background:
-                    focuedChatWindowUserId.id === user.id ? "#2B2D31" : "transparent",
+                    focuedChatWindowUserId.id === user.id
+                      ? "#2B2D31"
+                      : "transparent",
                 }}
                 className="flex bg-slate-200 px-3 py-3 cursor-pointer justify-start items-center gap-x-2 flex-1 hover:bg-accentColor1 mx-2 rounded-md"
               >

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import ChatWindow from "../Components/ChatWindow";
 import Users from "../Components/Users";
+import AudioRecorder from "../Components/AudioRecorder";
 
 const Home = () => {
   const [focuedChatWindowUserId, setFocuedChatWindowUserId] = useState("");
-  
 
   return (
     <div className="h-screen w-screen bg-accentColor2 flex justify-center items-center">
